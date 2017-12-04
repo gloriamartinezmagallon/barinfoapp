@@ -1,0 +1,2 @@
+# barinfoapp
+App android 
