@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "760876073544",
+    "firebase_url": "https://proyecto-bar-opiniiones.firebaseio.com",
+    "project_id": "proyecto-bar-opiniiones",
+    "storage_bucket": "proyecto-bar-opiniiones.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:760876073544:android:6d7300b405eb42b6",
+        "android_client_info": {
+          "package_name": "barinfo.navdev.barinfo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "760876073544-kemnptsjn1mn90s3tgap20qqvhekoqoh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB0lNu3cdj6Gduhigj8em9kUIGXNwCKQww"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
