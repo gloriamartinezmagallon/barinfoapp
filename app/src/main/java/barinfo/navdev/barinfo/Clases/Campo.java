@@ -18,6 +18,8 @@ public class Campo implements Serializable{
     String marcaSeleccionada;
     int tamanioSeleccionada;
 
+    boolean quetenga;
+
     public int getId() {
         return id;
     }
@@ -122,5 +124,13 @@ public class Campo implements Serializable{
 
     public static ArrayList<String> getDefaultTamanios(){
         return new ArrayList<String>(Arrays.asList("Pequeño","Normal","Grande"));
+    }
+
+    public boolean isQuetenga() {
+        return quetenga;
+    }
+
+    public void setQuetenga(boolean quetenga) {
+        this.quetenga = quetenga;
     }
 }

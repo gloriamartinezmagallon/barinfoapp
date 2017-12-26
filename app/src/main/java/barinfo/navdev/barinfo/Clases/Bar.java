@@ -2,6 +2,7 @@ package barinfo.navdev.barinfo.Clases;
 
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 public class Bar implements Serializable{
     int id;
@@ -17,6 +18,15 @@ public class Bar implements Serializable{
     double longitud;
 
     double distance;
+
+    ArrayList<Opinion> opiniones;
+
+    public ArrayList<Opinion> getOpiniones() {
+        return opiniones;
+    }
+
+
+
 
     public int getId() {
         return id;

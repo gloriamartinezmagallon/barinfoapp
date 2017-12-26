@@ -3,7 +3,6 @@ package barinfo.navdev.barinfo.Fragments;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,11 +13,14 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import barinfo.navdev.barinfo.Clases.Bar;
 import barinfo.navdev.barinfo.Clases.Buscador;
 import barinfo.navdev.barinfo.R;
 import barinfo.navdev.barinfo.Utils.AlertUtils;
+import barinfo.navdev.barinfo.Utils.Constants;
+import barinfo.navdev.barinfo.Utils.PreferencesManager;
 import barinfo.navdev.barinfo.Utils.RestClient;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -26,10 +28,12 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class LoadingFragment extends Fragment {
+public class LoadingFragment extends BaseFragment {
 
     Buscador buscador;
     ArrayList<Bar> bares;
+
+    long mUUID;
 
     private OnLoadFinishListener mCallback;
     public interface OnLoadFinishListener {
@@ -42,6 +46,15 @@ public class LoadingFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        PreferencesManager.initializeInstance(getContext());
+
+        mUUID = PreferencesManager.getInstance().getValue(Constants.PREF_UUID);
+        if (mUUID == 0){
+            mUUID = new Date().getTime();
+            PreferencesManager.getInstance().setValue(Constants.PREF_UUID,mUUID);
+        }
+
         initBuscador();
     }
 
@@ -112,7 +125,7 @@ public class LoadingFragment extends Fragment {
 
         RestClient restClient = retrofit.create(RestClient.class);
 
-        Call<ArrayList<Bar>> call = restClient.getBares(buscador.getLatitud(),buscador.getLongitud());
+        Call<ArrayList<Bar>> call = restClient.getBares(mUUID, buscador.getLatitud(),buscador.getLongitud());
 
         call.enqueue(new Callback<ArrayList<Bar>>() {
             @Override

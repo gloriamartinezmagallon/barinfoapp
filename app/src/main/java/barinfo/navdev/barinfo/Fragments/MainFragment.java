@@ -2,7 +2,6 @@ package barinfo.navdev.barinfo.Fragments;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -21,7 +20,7 @@ import barinfo.navdev.barinfo.Clases.Buscador;
 import barinfo.navdev.barinfo.R;
 import barinfo.navdev.barinfo.Utils.Constants;
 
-public class MainFragment extends Fragment {
+public class MainFragment extends BaseFragment {
 
     public static final String TAG = "MainFragment";
 
@@ -31,6 +30,7 @@ public class MainFragment extends Fragment {
     private RecyclerView lista, tipos;
 
     private OnBarIsSelected mBarSelectedListener;
+    private OnFilterButtonClick mFilterButtonClick;
 
     public MainFragment() { }
 
@@ -94,7 +94,9 @@ public class MainFragment extends Fragment {
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.action_filter:
-                        //TODO filtrar();
+                        if (mFilterButtonClick != null){
+                            mFilterButtonClick.onFilterButtonClick();
+                        }
                         return true;
 
                     default:
@@ -123,15 +125,27 @@ public class MainFragment extends Fragment {
             throw new RuntimeException(context.toString()
                     + " must implement OnBarIsSelected");
         }
+
+        if (context instanceof OnFilterButtonClick) {
+            mFilterButtonClick = (OnFilterButtonClick) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnFilterButtonClick");
+        }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
         mBarSelectedListener = null;
+        mFilterButtonClick = null;
     }
 
     public interface OnBarIsSelected {
         void onBarIsSelected(Bar bar);
+    }
+
+    public interface OnFilterButtonClick {
+        void onFilterButtonClick();
     }
 }

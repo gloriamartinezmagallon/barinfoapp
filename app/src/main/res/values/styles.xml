@@ -1,5 +1,4 @@
-<resources
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<resources xmlns:android="http://schemas.android.com/apk/res/android"
 
     >
 
@@ -37,7 +36,6 @@
     </style>
 
 
-
     <style name="AppTheme.Text.Headline" parent="Base.TextAppearance.AppCompat.Headline">
         <item name="android:paddingTop">8dp</item>
     </style>
@@ -58,13 +56,13 @@
     <style name="AppTheme.LinearLayoutSeparator" parent="Theme.AppCompat">
         <item name="android:background">#33000000</item>
     </style>
+
     <style name="AppTheme.LinearLayoutSeparator.Horizontal">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">1dp</item>
         <item name="android:layout_marginTop">@dimen/activity_vertical_margin_small</item>
         <item name="android:layout_marginBottom">@dimen/activity_vertical_margin_small</item>
     </style>
-
 
 
 </resources>

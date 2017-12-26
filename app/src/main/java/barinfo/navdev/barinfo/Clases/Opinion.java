@@ -2,6 +2,7 @@ package barinfo.navdev.barinfo.Clases;
 
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 public class Opinion implements Serializable {
 
@@ -11,9 +12,15 @@ public class Opinion implements Serializable {
     int precio;
     String texto;
     int tipo_id;
-    String device_id;
+    String deviceid;
+    Tipo tipo;
+    ArrayList<CampoOpinion> camposopiniones;
+
+    ArrayList<CampoOpinion> campos;
 
     public Opinion() {
+        campos = new ArrayList<>();
+        camposopiniones = new ArrayList<>();
     }
 
     public int getId() {
@@ -64,11 +71,35 @@ public class Opinion implements Serializable {
         this.tipo_id = tipo_id;
     }
 
-    public String getDevice_id() {
-        return device_id;
+    public String getDeviceid() {
+        return deviceid;
     }
 
-    public void setDevice_id(String device_id) {
-        this.device_id = device_id;
+    public void setDeviceid(String deviceid) {
+        this.deviceid = deviceid;
+    }
+
+    public ArrayList<CampoOpinion> getCampos() {
+        return campos;
+    }
+
+    public void setCampos(ArrayList<CampoOpinion> campos) {
+        this.campos = campos;
+    }
+
+    public void addCampoOpinion(CampoOpinion campoOpinion){
+        this.campos.add(campoOpinion);
+    }
+
+    public Tipo getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(Tipo tipo) {
+        this.tipo = tipo;
+    }
+
+    public ArrayList<CampoOpinion> getCamposopiniones() {
+        return camposopiniones;
     }
 }

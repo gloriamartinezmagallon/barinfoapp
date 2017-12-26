@@ -10,6 +10,9 @@ import java.util.ArrayList;
 public class Buscador implements Serializable{
 
     boolean conOpiniones = true;
+    Tipo tipoSeleccionado;
+    String localidadSeleccionada;
+
     ArrayList<String> localidades;
     ArrayList<String> tiposgn;
     ArrayList<String> especialidades;
@@ -82,5 +85,21 @@ public class Buscador implements Serializable{
         }
 
         return json;
+    }
+
+    public Tipo getTipoSeleccionado() {
+        return tipoSeleccionado;
+    }
+
+    public void setTipoSeleccionado(Tipo tipoSeleccionado) {
+        this.tipoSeleccionado = tipoSeleccionado;
+    }
+
+    public String getLocalidadSeleccionada() {
+        return localidadSeleccionada;
+    }
+
+    public void setLocalidadSeleccionada(String localidadSeleccionada) {
+        this.localidadSeleccionada = localidadSeleccionada;
     }
 }

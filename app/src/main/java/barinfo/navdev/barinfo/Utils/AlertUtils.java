@@ -2,6 +2,7 @@ package barinfo.navdev.barinfo.Utils;
 
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 
@@ -36,7 +37,7 @@ public class AlertUtils {
         void onNo();
     }
 
-    public static AlertDialog yesNoDialog(Context context, String string, String title, String message, String yes, String no, final OnYesNoDialog onYesNoDialog){
+    public static AlertDialog yesNoDialog(Context context, String title, String message, String yes, String no, final OnYesNoDialog onYesNoDialog){
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle(title);
         builder.setMessage(message);
@@ -60,6 +61,12 @@ public class AlertUtils {
         });
         AlertDialog dialog = builder.create();
         dialog.setCancelable(false);
+        return dialog;
+    }
+
+    public static ProgressDialog progressDialog(Context context, String message){
+        ProgressDialog dialog = new ProgressDialog(context);
+        dialog.setMessage(message);
         return dialog;
     }
 }

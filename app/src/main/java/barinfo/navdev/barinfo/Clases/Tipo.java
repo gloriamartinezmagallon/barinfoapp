@@ -7,6 +7,10 @@ public class Tipo  implements Serializable {
     int id;
     String nombre;
 
+    public Tipo() {
+        nombre = "";
+    }
+
     public int getId() {
         return id;
     }

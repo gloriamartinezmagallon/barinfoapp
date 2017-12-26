@@ -6,13 +6,12 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
-import android.support.v4.app.Fragment;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -28,17 +27,33 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
+
+import amagi82.flexibleratingbar.FlexibleRatingBar;
 import barinfo.navdev.barinfo.Clases.Bar;
+import barinfo.navdev.barinfo.Clases.CampoOpinion;
+import barinfo.navdev.barinfo.Clases.Opinion;
 import barinfo.navdev.barinfo.R;
 import barinfo.navdev.barinfo.Utils.Constants;
+import barinfo.navdev.barinfo.Utils.PreferencesManager;
 
-public class BarDetailsFragment extends Fragment {
+public class BarDetailsFragment extends BaseFragment {
 
     public static final String TAG = "BarDetailsFragment";
 
     private Bar mBar;
 
+    private Bundle mBundle;
+
     private OnAddOpinion mListener;
+
+    View mView;
+
+    long mUUID;
+    Opinion miOpinion = null;
 
     public BarDetailsFragment() {
         // Required empty public constructor
@@ -58,6 +73,10 @@ public class BarDetailsFragment extends Fragment {
         if (getArguments() != null) {
             mBar =(Bar) getArguments().getSerializable(Constants.EXTRA_BAR);
         }
+
+        mUUID = PreferencesManager.getInstance().getValue(Constants.PREF_UUID);
+
+        mBundle = savedInstanceState;
     }
 
     @Override
@@ -87,10 +106,11 @@ public class BarDetailsFragment extends Fragment {
 
         cargarImagen(v);
 
-        cargarInfo(v,savedInstanceState);
+        mView = v;
+        cargarInfo();
 
 
-        Button addOpinion = (Button) v.findViewById(R.id.addOpinion);
+        FloatingActionButton addOpinion = (FloatingActionButton) v.findViewById(R.id.fab);
         addOpinion.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -101,8 +121,8 @@ public class BarDetailsFragment extends Fragment {
         return v;
     }
 
-    private void cargarInfo(View v, Bundle savedInstanceState){
-        TextView especialidad  = (TextView) v.findViewById(R.id.especialidad);
+    private void cargarInfo(){
+        TextView especialidad  = (TextView) mView.findViewById(R.id.especialidad);
 
         if (mBar.getEspecialidad() != null && mBar.getEspecialidad() != ""){
             especialidad.setText(mBar.getEspecialidad());
@@ -111,12 +131,12 @@ public class BarDetailsFragment extends Fragment {
         }
 
 
-        LinearLayout infoubicacion = (LinearLayout) v.findViewById(R.id.infoubicacion);
+        LinearLayout infoubicacion = (LinearLayout) mView.findViewById(R.id.infoubicacion);
 
         if (mBar.getLatitud() != 0){
-            TextView zona = (TextView) v.findViewById(R.id.zona);
-            TextView direccion = (TextView) v.findViewById(R.id.direccion);
-            TextView distancia = (TextView) v.findViewById(R.id.distancia);
+            TextView zona = (TextView) mView.findViewById(R.id.zona);
+            TextView direccion = (TextView) mView.findViewById(R.id.direccion);
+            TextView distancia = (TextView) mView.findViewById(R.id.distancia);
 
             if (mBar.getDireccion() == null || mBar.getDireccion().equalsIgnoreCase("")){
                 direccion.setText(mBar.getNombreLocalidad());
@@ -132,8 +152,8 @@ public class BarDetailsFragment extends Fragment {
             }
 
             zona.setText(mBar.getDescripZona());
-            final MapView mapview = (MapView) v.findViewById(R.id.map);
-            mapview.onCreate(savedInstanceState);
+            final MapView mapview = (MapView) mView.findViewById(R.id.map);
+            mapview.onCreate(mBundle);
             mapview.getMapAsync(new OnMapReadyCallback() {
                 @Override
                 public void onMapReady(GoogleMap googleMap) {
@@ -160,6 +180,139 @@ public class BarDetailsFragment extends Fragment {
             });
         }else{
             infoubicacion.setVisibility(View.GONE);
+        }
+
+        //CARGAR OPINIONES
+        if (mBar.getOpiniones().size() == 0)
+            return;
+
+
+        float calidadmedia = 0;
+        HashMap<String, Integer> tipos = new HashMap<>();
+        for(Opinion o: mBar .getOpiniones()){
+
+            if (o.getDeviceid() != null && o.getDeviceid().equalsIgnoreCase(mUUID+"")){
+                miOpinion = o;
+            }
+            calidadmedia += o.getCalidad();
+
+            if(o.getTipo() != null) {
+                if (!tipos.containsKey(o.getTipo().getNombre())) {
+                    tipos.put(o.getTipo().getNombre(), 0);
+                }
+                tipos.put(o.getTipo().getNombre(), tipos.get(o.getTipo().getNombre()) + 1);
+            }
+        }
+        calidadmedia = calidadmedia/mBar.getOpiniones().size();
+
+        FlexibleRatingBar flexibleRatingBar = (FlexibleRatingBar) mView.findViewById(R.id.flexibleRatingBar);
+        flexibleRatingBar.setRating(calidadmedia);
+        TextView numopiniones = (TextView) mView.findViewById(R.id.numopiniones);
+        if (mBar.getOpiniones().size() > 1)
+            numopiniones.setText(mBar.getOpiniones().size()+" opiniones");
+        else
+            numopiniones.setText(mBar.getOpiniones().size()+" opinión");
+
+        LinearLayout containerTipos = (LinearLayout) mView.findViewById(R.id.containerTipos);
+
+        Object[] a = tipos.entrySet().toArray();
+        Arrays.sort(a, new Comparator() {
+            public int compare(Object o1, Object o2) {
+                return ((Map.Entry<String, Integer>) o2).getValue()
+                        .compareTo(((Map.Entry<String, Integer>) o1).getValue());
+            }
+        });
+
+
+        for(Object e : a){
+            View child = getActivity().getLayoutInflater().inflate(R.layout.item_tipoopinion, null);
+            TextView nombre = (TextView) child.findViewById(R.id.nombre);
+            nombre.setText(((Map.Entry<String, Integer>) e).getKey());
+            TextView numoks = (TextView) child.findViewById(R.id.numoks);
+            numoks.setText(((Map.Entry<String, Integer>) e).getValue()+"");
+            containerTipos.addView(child);
+        }
+
+        //CARGAR OPINIONES POR CAMPOS
+
+        LinearLayout containerCampos = (LinearLayout) mView.findViewById(R.id.containerTiene);
+        HashMap<String, HashMap<String,Integer>> campos = new HashMap<>();
+        for (Opinion o: mBar.getOpiniones()) {
+            for (CampoOpinion campoOpinion : o.getCamposopiniones()) {
+                if (!campos.containsKey(campoOpinion.getCampo().getNombre())) {
+                    campos.put(campoOpinion.getCampo().getNombre(), new HashMap<String, Integer>());
+                }
+                String key = "";
+                if (campoOpinion.getMarcas().size() > 0) {
+                    key = campoOpinion.getMarcas().get(0).getNombre();
+                }
+                key += "_";
+                if (campoOpinion.getTamanios().size() > 0) {
+                    key += campoOpinion.getTamanios().get(0).getTamanio();
+                }
+                if (!campos.get(campoOpinion.getCampo().getNombre()).containsKey(key)) {
+                    campos.get(campoOpinion.getCampo().getNombre()).put(key, 0);
+                }
+                campos.get(campoOpinion.getCampo().getNombre()).put(key, campos.get(campoOpinion.getCampo().getNombre()).get(key) + 1);
+            }
+        }
+
+
+        for(String nombreCampo: campos.keySet()){
+            boolean primera = true;
+
+            Object[] b = campos.get(nombreCampo).entrySet().toArray();
+            Arrays.sort(b, new Comparator() {
+                public int compare(Object o1, Object o2) {
+                    return ((Map.Entry<String, Integer>) o2).getValue()
+                            .compareTo(((Map.Entry<String, Integer>) o1).getValue());
+                }
+            });
+
+
+            for(Object e : b){
+                View child = getActivity().getLayoutInflater().inflate(R.layout.item_campoopinion, null);
+
+                TextView nombre = (TextView) child.findViewById(R.id.nombre);
+                ImageView sizesmall = (ImageView) child.findViewById(R.id.sizesmall);
+                ImageView sizenormal = (ImageView) child.findViewById(R.id.sizenormal);
+                ImageView sizelarge = (ImageView) child.findViewById(R.id.sizelarge);
+                TextView marca = (TextView) child.findViewById(R.id.marca);
+                TextView numoks = (TextView) child.findViewById(R.id.numoks);
+
+                if (primera){
+                    nombre.setText(nombreCampo);
+                    primera = false;
+                }else{
+                    nombre.setVisibility(View.GONE);
+                }
+
+                String[] keys = ((Map.Entry<String, Integer>) e).getKey().split("_");
+                if (keys.length < 1){
+                    continue;
+                }
+                //MARCA
+                marca.setText(keys[0]);
+
+                //TAMANIO
+                if (keys.length > 1) {
+                    switch (keys[1]) {
+                        case "1":
+                            sizesmall.setAlpha(1f);
+                            break;
+                        case "2":
+                            sizenormal.setAlpha(1f);
+                            break;
+                        case "3":
+                            sizelarge.setAlpha(1f);
+                            break;
+                    }
+                }
+
+                numoks.setText(((Map.Entry<String, Integer>) e).getValue()+"");
+                containerCampos.addView(child);
+            }
+
         }
     }
 
@@ -188,7 +341,7 @@ public class BarDetailsFragment extends Fragment {
 
     public void addOpinion() {
         if (mListener != null) {
-            mListener.onAddOpinion();
+            mListener.onAddOpinion(miOpinion);
         }
     }
 
@@ -203,6 +356,11 @@ public class BarDetailsFragment extends Fragment {
         }
     }
 
+    public void setBar(Bar bar){
+        mBar = bar;
+        cargarInfo();
+    }
+
     @Override
     public void onDetach() {
         super.onDetach();
@@ -210,6 +368,6 @@ public class BarDetailsFragment extends Fragment {
     }
 
     public interface OnAddOpinion {
-        void onAddOpinion();
+        void onAddOpinion(Opinion opinion);
     }
 }
