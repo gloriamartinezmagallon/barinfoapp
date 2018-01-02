@@ -23,6 +23,8 @@ public class Buscador implements Serializable{
     double latitud;
     double longitud;
 
+    int distancia = 0;
+
     public boolean isConOpiniones() {
         return conOpiniones;
     }
@@ -101,5 +103,13 @@ public class Buscador implements Serializable{
 
     public void setLocalidadSeleccionada(String localidadSeleccionada) {
         this.localidadSeleccionada = localidadSeleccionada;
+    }
+
+    public int getDistancia() {
+        return distancia;
+    }
+
+    public void setDistancia(int distancia) {
+        this.distancia = distancia;
     }
 }

@@ -2,7 +2,6 @@ package barinfo.navdev.barinfo.Fragments;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
@@ -20,12 +19,11 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.OnStreetViewPanoramaReadyCallback;
+import com.google.android.gms.maps.StreetViewPanorama;
+import com.google.android.gms.maps.SupportStreetViewPanoramaFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
-import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -43,6 +41,9 @@ import barinfo.navdev.barinfo.Utils.PreferencesManager;
 public class BarDetailsFragment extends BaseFragment {
 
     public static final String TAG = "BarDetailsFragment";
+
+    //API GOOGLE STREET VIEW IMAGE
+    //AIzaSyBXauccdW03Fn485kfvRj0qpcJzWyODUQc
 
     private Bar mBar;
 
@@ -118,6 +119,15 @@ public class BarDetailsFragment extends BaseFragment {
             }
         });
 
+
+        FloatingActionButton addOpinion2 = (FloatingActionButton) v.findViewById(R.id.fab2);
+        addOpinion2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                addOpinion();
+            }
+        });
+
         return v;
     }
 
@@ -183,9 +193,12 @@ public class BarDetailsFragment extends BaseFragment {
         }
 
         //CARGAR OPINIONES
-        if (mBar.getOpiniones().size() == 0)
+        LinearLayout infoopiniones = (LinearLayout) mView.findViewById(R.id.infoopiniones);
+        if (mBar.getOpiniones().size() == 0) {
+            infoopiniones.setVisibility(View.GONE);
             return;
-
+        }
+        infoopiniones.setVisibility(View.VISIBLE);
 
         float calidadmedia = 0;
         HashMap<String, Integer> tipos = new HashMap<>();
@@ -317,9 +330,24 @@ public class BarDetailsFragment extends BaseFragment {
     }
 
     private void cargarImagen(View v){
+
+        SupportStreetViewPanoramaFragment streetViewPanoramaFragment = new SupportStreetViewPanoramaFragment();
+        getChildFragmentManager().beginTransaction()
+                .replace(R.id.streetviewpanorama_container, streetViewPanoramaFragment)
+                .commit();
+
+        streetViewPanoramaFragment.getStreetViewPanoramaAsync(
+                new OnStreetViewPanoramaReadyCallback() {
+                    @Override
+                    public void onStreetViewPanoramaReady(StreetViewPanorama panorama) {
+                        if (mBundle == null)
+                         panorama.setPosition(new LatLng(mBar.getLatitud(),mBar.getLongitud()));
+                    }
+                });
+
         if (mBar.getImgFicheroGN() != null && !mBar.getImgFicheroGN().equalsIgnoreCase("")){
 
-            DisplayImageOptions defaultOptions = new DisplayImageOptions.Builder()
+            /*DisplayImageOptions defaultOptions = new DisplayImageOptions.Builder()
                     .cacheInMemory(true)
                     .build();
             ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getContext())
@@ -334,7 +362,7 @@ public class BarDetailsFragment extends BaseFragment {
                 public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
                     photo.setImageBitmap(loadedImage);
                 }
-            });
+            });*/
         }
     }
 

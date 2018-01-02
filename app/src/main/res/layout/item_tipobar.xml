@@ -17,7 +17,6 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_gravity="left|center"
-                android:layout_marginRight="8dp"
                 android:id="@+id/textTipo"
                 style="@style/AppTheme.Text.Body2"
                 />

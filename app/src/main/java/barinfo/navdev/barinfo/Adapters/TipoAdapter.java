@@ -7,9 +7,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
-
 import java.util.List;
 
 import barinfo.navdev.barinfo.Clases.Tipo;
@@ -21,15 +18,17 @@ public class TipoAdapter extends RecyclerView.Adapter<TipoAdapter.ViewHolder>{
 
     Activity mActivity;
 
-    ImageLoader imageLoader;
 
-    public TipoAdapter(List<Tipo> tipos, Activity activity) {
+    public interface OnItemClick{
+        void onClick(Tipo tipo);
+    };
+
+    OnItemClick monItemClick;
+
+    public TipoAdapter(List<Tipo> tipos, Activity activity, OnItemClick onItemClick) {
         this.mTipos = tipos;
         this.mActivity = activity;
-
-        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(mActivity).build();
-        imageLoader = ImageLoader.getInstance();
-        imageLoader.init(config);
+        this.monItemClick = onItemClick;
     }
 
     @Override
@@ -40,17 +39,20 @@ public class TipoAdapter extends RecyclerView.Adapter<TipoAdapter.ViewHolder>{
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(final ViewHolder holder, int position) {
 
         final Tipo tipo = mTipos.get(position);
 
+        holder.tipo = tipo;
 
         holder.nombre.setText(tipo.getNombre());
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // irAFicha(bar);
+                if (monItemClick != null){
+                    monItemClick.onClick(holder.tipo);
+                }
             }
         });
     }
@@ -68,6 +70,7 @@ public class TipoAdapter extends RecyclerView.Adapter<TipoAdapter.ViewHolder>{
     public class ViewHolder extends RecyclerView.ViewHolder {
         TextView nombre;
         View itemView;
+        Tipo tipo;
 
         ViewHolder(View itemView) {
             super(itemView);

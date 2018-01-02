@@ -1,19 +1,12 @@
 package barinfo.navdev.barinfo.Adapters;
 
 import android.app.Activity;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
-import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 
 import java.util.List;
 
@@ -27,7 +20,7 @@ public class BarAdapter extends RecyclerView.Adapter<BarAdapter.ClienteViewHolde
 
     Activity mActivity;
 
-    ImageLoader imageLoader;
+    //ImageLoader imageLoader;
 
     public interface OnItemClick{
         void onClick(Bar bar);
@@ -43,14 +36,14 @@ public class BarAdapter extends RecyclerView.Adapter<BarAdapter.ClienteViewHolde
 
         this.monItemClick = onItemClick;
 
-        DisplayImageOptions defaultOptions = new DisplayImageOptions.Builder()
+        /*DisplayImageOptions defaultOptions = new DisplayImageOptions.Builder()
                 .cacheInMemory(true)
                 .build();
         ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(mActivity)
                 .defaultDisplayImageOptions(defaultOptions)
                 .build();
         imageLoader = ImageLoader.getInstance();
-        imageLoader.init(config);
+        imageLoader.init(config);*/
     }
 
     @Override
@@ -65,7 +58,7 @@ public class BarAdapter extends RecyclerView.Adapter<BarAdapter.ClienteViewHolde
 
         final Bar bar = mBares.get(position);
         holder.setBar(bar);
-        if (bar.getImgFicheroGN() != null && !bar.getImgFicheroGN().equalsIgnoreCase("")){
+       /* if (bar.getImgFicheroGN() != null && !bar.getImgFicheroGN().equalsIgnoreCase("")){
 
             imageLoader.loadImage(bar.getImgFicheroGN(), new SimpleImageLoadingListener(){
                 @Override
@@ -74,7 +67,7 @@ public class BarAdapter extends RecyclerView.Adapter<BarAdapter.ClienteViewHolde
                     holder.photo.setBackground(ob);
                 }
             });
-        }
+        }*/
 
         holder.nombre.setText(bar.getNombre());
 
@@ -83,6 +76,22 @@ public class BarAdapter extends RecyclerView.Adapter<BarAdapter.ClienteViewHolde
         }else{
             holder.distancia.setVisibility(View.VISIBLE);
             holder.distancia.setText(bar.getDistanceWithFormat());
+        }
+
+        holder.direccion.setText(bar.getDireccion());
+
+        if (bar.getOpiniones_count() == 0){
+            holder.numopiniones.setVisibility(View.GONE);
+        }else{
+            holder.numopiniones.setVisibility(View.VISIBLE);
+            String texto = bar.getOpiniones_count()+" ";
+            if (bar.getOpiniones_count() > 1){
+                texto +="opiniones";
+            }else{
+                texto +="opinión";
+            }
+            holder.numopiniones.setText(texto);
+
         }
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -109,6 +118,8 @@ public class BarAdapter extends RecyclerView.Adapter<BarAdapter.ClienteViewHolde
         ImageView photo;
         TextView nombre;
         TextView distancia;
+        TextView direccion;
+        TextView numopiniones;
         View itemView;
 
         Bar bar;
@@ -124,6 +135,8 @@ public class BarAdapter extends RecyclerView.Adapter<BarAdapter.ClienteViewHolde
             photo = (ImageView) itemView.findViewById(R.id.photo);
             nombre = (TextView)itemView.findViewById(R.id.nombre);
             distancia = (TextView)itemView.findViewById(R.id.distancia);
+            direccion = (TextView)itemView.findViewById(R.id.direccion);
+            numopiniones = (TextView)itemView.findViewById(R.id.numopiniones);
         }
     }
 }

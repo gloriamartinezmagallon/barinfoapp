@@ -6,6 +6,9 @@
     <color name="colorAccent">#00838f</color>
 
 
+    <color name="bgPrimary">#2200838f</color>
+
+
     <color name="colorSecundary">#424242</color>
     <color name="colorSecundaryDark">#1b1b1b</color>
     <color name="colorSecundaryLight">#6d6d6d</color>

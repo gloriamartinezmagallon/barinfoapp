@@ -24,7 +24,6 @@ public class AlertUtils {
                 if (onErrorDialog != null){
                     onErrorDialog.run();
                 }
-                dialog.dismiss();
             }
         });
         AlertDialog dialog = builder.create();

@@ -1,8 +1,14 @@
 package barinfo.navdev.barinfo.Fragments;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,12 +17,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
+import android.widget.TextView;
 
-import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.weiwangcn.betterspinner.library.material.MaterialBetterSpinner;
@@ -24,6 +32,7 @@ import com.weiwangcn.betterspinner.library.material.MaterialBetterSpinner;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import barinfo.navdev.barinfo.Adapters.BarAdapter;
 import barinfo.navdev.barinfo.Clases.Bar;
 import barinfo.navdev.barinfo.Clases.Buscador;
 import barinfo.navdev.barinfo.Clases.Campo;
@@ -32,8 +41,11 @@ import barinfo.navdev.barinfo.Clases.Tipo;
 import barinfo.navdev.barinfo.R;
 import barinfo.navdev.barinfo.Utils.AlertUtils;
 import barinfo.navdev.barinfo.Utils.Constants;
+import barinfo.navdev.barinfo.Utils.PermissionUtils;
 import barinfo.navdev.barinfo.Utils.PreferencesManager;
 import barinfo.navdev.barinfo.Utils.RestClient;
+import barinfo.navdev.barinfo.Utils.SeekBarWithHint;
+import barinfo.navdev.barinfo.Utils.SingleShotLocationProvider;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -45,22 +57,32 @@ public class FilterFragment extends BaseFragment {
     public static final String TAG = "FilterFragment";
 
     private Buscador mBuscador;
+    private ArrayList<Bar> mBares;
 
     MaterialBetterSpinner mTipoACTV;
     MaterialBetterSpinner mLocalidadACTV;
+    SeekBarWithHint mDistanciaSeekbar;
+    TextView mTextoaddpermiso;
+    Button mButtonAddBar;
 
     Tipo tipoSeleccionado;
     String localidadSeleccionada;
 
 
+
     LinearLayout mProgressBarContainer;
+    ScrollView mFormulario;
+    LinearLayout mResultados;
+    RecyclerView mLista;
+    Toolbar mToolbar;
+
     HashMap<Integer,View> camposViews;
 
 
     LinearLayout camposLL;
 
-    private OnCancelButtonClick mCancelListener;
-    private OnFilterButtonClick mFilterListener;
+    private OnListFragmentInteractionListener mListener;
+    private OnButtonAddBarListener mAddBarListener;
 
     public FilterFragment() { }
 
@@ -87,8 +109,18 @@ public class FilterFragment extends BaseFragment {
         View v =  inflater.inflate(R.layout.fragment_filter, container, false);
 
         mProgressBarContainer  = (LinearLayout) v.findViewById(R.id.progressBarContainer);
+        mFormulario  = (ScrollView) v.findViewById(R.id.formulario);
+        mResultados  = (LinearLayout) v.findViewById(R.id.resultados);
+        mLista = (RecyclerView) v.findViewById(R.id.recyclerView);
+        mLista.setLayoutManager(new LinearLayoutManager(getContext()));
 
+        mDistanciaSeekbar = (SeekBarWithHint) v.findViewById(R.id.distanciaSeekbar);
+        mDistanciaSeekbar.setMax(20000);
+        mDistanciaSeekbar.incrementProgressBy(100);
+        mDistanciaSeekbar.setProgress(mBuscador.getDistancia());
         mTipoACTV = (MaterialBetterSpinner) v.findViewById(R.id.tipoACView);
+        mTextoaddpermiso = (TextView) v.findViewById(R.id.textoaddpermiso);
+        comprobarPermisoUbicacion();
 
         int layoutItemId = android.R.layout.simple_spinner_dropdown_item;
         ArrayList<Tipo> tipos = new ArrayList<>(mBuscador.getTipos());
@@ -97,7 +129,8 @@ public class FilterFragment extends BaseFragment {
         if (mBuscador.getTipoSeleccionado() != null){
             for (int i = 0; i < mBuscador.getTipos().size(); i++){
                 if (mBuscador.getTipos().get(i).getId() == mBuscador.getTipoSeleccionado().getId()){
-                    mTipoACTV.setSelection(i);
+                    mTipoACTV.setText(mBuscador.getTipos().get(i).getNombre());
+                    tipoSeleccionado = mBuscador.getTipos().get(i);
                     break;
                 }
             }
@@ -105,7 +138,10 @@ public class FilterFragment extends BaseFragment {
         mTipoACTV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                tipoSeleccionado = mBuscador.getTipos().get(i);
+                if (i > 0)
+                    tipoSeleccionado = mBuscador.getTipos().get(i-1);
+                else
+                    tipoSeleccionado = null;
             }
         });
 
@@ -198,31 +234,44 @@ public class FilterFragment extends BaseFragment {
             camposViews.put(c.getId(),child);
         }
 
+        mButtonAddBar = (Button) v.findViewById(R.id.buttonAddBar);
+        mButtonAddBar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mAddBarListener.onAddBar();
+            }
+        });
+
         setupActionBar(v);
 
         return v;
     }
 
     private void setupActionBar(View v) {
-        Toolbar toolbar = (Toolbar) v.findViewById(R.id.toolbar);
+        mToolbar = (Toolbar) v.findViewById(R.id.toolbar);
 
-        toolbar.setTitle(getResources().getString(R.string.app_name));
-        toolbar.inflateMenu(R.menu.menu_main);
+        mToolbar.setTitle(getResources().getString(R.string.app_name));
+        mToolbar.inflateMenu(R.menu.menu_main);
 
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                int hola = 11;
+                cargarLista();
             }
         });
-        toolbar.setNavigationIcon(R.drawable.ic_close_actionbar);
 
-        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+        mToolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.action_filter:
-                        filtrar();
+                        if (mFormulario.getVisibility() == View.VISIBLE)
+                            filtrar();
+                        else{
+                            mResultados.setVisibility(View.GONE);
+                            mFormulario.setVisibility(View.VISIBLE);
+                            mToolbar.setNavigationIcon(R.drawable.ic_close_actionbar);
+                        }
                         return true;
 
                     default:
@@ -235,33 +284,37 @@ public class FilterFragment extends BaseFragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnFilterButtonClick) {
-            mFilterListener = (OnFilterButtonClick) context;
+        if (context instanceof OnListFragmentInteractionListener) {
+            mListener = (OnListFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnFilterButtonClick");
+                    + " must implement OnListFragmentInteractionListener");
         }
 
-        if (context instanceof OnCancelButtonClick) {
-            mCancelListener = (OnCancelButtonClick) context;
+        if (context instanceof OnButtonAddBarListener) {
+            mAddBarListener = (OnButtonAddBarListener) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnCancelButtonClick");
+                    + " must implement OnButtonAddBarListener");
         }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mCancelListener = null;
-        mFilterListener = null;
+        mListener = null;
     }
 
-    private void filtrar(){
+    public void filtrar(){
 
         mProgressBarContainer.setVisibility(View.VISIBLE);
+        mResultados.setVisibility(View.GONE);
+        mFormulario.setVisibility(View.GONE);
+
         mBuscador.setLocalidadSeleccionada(localidadSeleccionada);
         mBuscador.setTipoSeleccionado(tipoSeleccionado);
+
+        mBuscador.setDistancia(mDistanciaSeekbar.getProgress());
 
 
         for (Integer campo_id: camposViews.keySet()){
@@ -306,7 +359,6 @@ public class FilterFragment extends BaseFragment {
 
 
         Gson gson = new GsonBuilder()
-                .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
                 .create();
 
         Retrofit retrofit = new Retrofit.Builder()
@@ -322,7 +374,8 @@ public class FilterFragment extends BaseFragment {
                     mBuscador.getLocalidadSeleccionada(),
                     (mBuscador.getTipoSeleccionado() != null ? mBuscador.getTipoSeleccionado().getId(): 0),
                     "","", mBuscador.camposToJSON()
-                    ,mBuscador.getLatitud(),mBuscador.getLongitud());
+                    ,mBuscador.getLatitud(),mBuscador.getLongitud()
+                    ,mBuscador.getDistancia());
 
             call.enqueue(new Callback<ArrayList<Bar>>() {
                 @Override
@@ -332,18 +385,29 @@ public class FilterFragment extends BaseFragment {
 
                     switch (response.code()) {
                         case 200:
-                            ArrayList<Bar> bares = response.body();
-                            if (bares.size() == 0){
-                                AlertUtils.errorDialog(getContext(), getString(R.string.filtro_sinresultados), new AlertUtils.OnErrorDialog() {
+                            mBares = response.body();
+                            if (mBares.size() == 0){
+                                mResultados.setVisibility(View.GONE);
+                                mFormulario.setVisibility(View.VISIBLE);
+                                AlertUtils.yesNoDialog(getContext(), null,getString(R.string.filtro_sinresultados), "Volver a buscar", "Añadir bar", new AlertUtils.OnYesNoDialog() {
                                     @Override
-                                    public void run() {}
+                                    public void onYes() { }
+
+                                    @Override
+                                    public void onNo() {
+                                        mAddBarListener.onAddBar();
+                                    }
                                 }).show();
+
                             }else{
-                                mFilterListener.onClickFilterButton(mBuscador,bares);
+                                //mFilterListener.onClickFilterButton(mBuscador,bares);
+                                cargarLista();
                             }
                             break;
 
                         default:
+                            mResultados.setVisibility(View.GONE);
+                            mFormulario.setVisibility(View.VISIBLE);
                             AlertUtils.errorDialog(getContext(), getString(R.string.error_initbuscador), new AlertUtils.OnErrorDialog() {
                                 @Override
                                 public void run() {
@@ -378,11 +442,58 @@ public class FilterFragment extends BaseFragment {
 
     }
 
-    public interface OnFilterButtonClick {
-        void onClickFilterButton(Buscador buscador, ArrayList<Bar> bares);
+    public void cargarLista(){
+        mToolbar.setNavigationIcon(null);
+        mResultados.setVisibility(View.VISIBLE);
+        mFormulario.setVisibility(View.GONE);
+
+        mLista.setAdapter(new BarAdapter(mBares, getActivity(), new BarAdapter.OnItemClick() {
+            @Override
+            public void onClick(Bar bar) {
+                mListener.onListBarSelected(bar);
+            }
+        }));
     }
 
-    public interface OnCancelButtonClick {
-        void onClickCancelButton();
+    public interface OnListFragmentInteractionListener {
+        void onListBarSelected(Bar bar);
+    }
+
+    public interface OnButtonAddBarListener {
+        void onAddBar();
+    }
+
+    private void comprobarPermisoUbicacion() {
+        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            mTextoaddpermiso.setVisibility(View.VISIBLE);
+            mDistanciaSeekbar.setEnabled(false);
+            mTextoaddpermiso.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
+            mTextoaddpermiso.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    PermissionUtils.requestPermission((AppCompatActivity) getActivity(),99,Manifest.permission.ACCESS_FINE_LOCATION,"Dar permiso para obtener tu ubicación actual", false);
+                }
+            });
+        }else{
+            mDistanciaSeekbar.setEnabled(false);
+            mTextoaddpermiso.setTextColor(getResources().getColor(R.color.colorPrimaryLight));
+            mTextoaddpermiso.setText("Obteniendo ubicación...");
+            SingleShotLocationProvider.requestSingleUpdate(getContext(), new SingleShotLocationProvider.LocationCallback() {
+                @Override
+                public void onNewLocationAvailable(SingleShotLocationProvider.GPSCoordinates location) {
+                    mBuscador.setLatitud(location.latitude);
+                    mTextoaddpermiso.setVisibility(View.GONE);
+                    mDistanciaSeekbar.setEnabled(true);
+                    mBuscador.setLongitud(location.longitude);
+                }
+            });
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        comprobarPermisoUbicacion();
     }
 }

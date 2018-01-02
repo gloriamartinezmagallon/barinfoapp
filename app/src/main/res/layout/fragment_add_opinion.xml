@@ -8,42 +8,20 @@
     <android.support.design.widget.AppBarLayout
         android:id="@+id/app_bar"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/app_bar_height"
+        android:layout_height="wrap_content"
         android:fitsSystemWindows="true"
         android:theme="@style/AppTheme.AppBarOverlay">
-
-        <android.support.design.widget.CollapsingToolbarLayout
-            android:id="@+id/toolbar_layout"
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:fitsSystemWindows="true"
-            app:contentScrim="@color/colorPrimary"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed"
-            app:expandedTitleTextAppearance="@style/AppTheme.Text.Transparent"
-            app:toolbarId="@+id/toolbar">
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/app_bar_height"
-                android:scaleType="centerCrop"
-                android:id="@+id/photo"
-                android:src="@drawable/defaultphoto"/>
-            <android.support.v7.widget.Toolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?android:attr/actionBarSize"
-                app:layout_collapseMode="pin"
-                app:popupTheme="@style/AppTheme.PopupOverlay" />
-
-        </android.support.design.widget.CollapsingToolbarLayout>
+            android:layout_height="?android:attr/actionBarSize" />
     </android.support.design.widget.AppBarLayout>
 
-    <android.support.v4.widget.NestedScrollView
+    <ScrollView
         android:layout_width="match_parent"
         android:background="@color/colorWhite"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        tools:context="barinfo.navdev.barinfo.FichaBarActivity"
-        tools:showIn="@layout/activity_ficha_bar">
+        tools:context="barinfo.navdev.barinfo.FichaBarActivity">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -129,7 +107,7 @@
                 android:text="Guardar opinión"
                 android:id="@+id/saveOpinion"/>
         </LinearLayout>
-    </android.support.v4.widget.NestedScrollView>
+    </ScrollView>
 
 
 </android.support.design.widget.CoordinatorLayout>

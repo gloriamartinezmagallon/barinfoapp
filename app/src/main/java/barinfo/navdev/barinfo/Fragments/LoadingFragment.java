@@ -94,7 +94,7 @@ public class LoadingFragment extends BaseFragment {
                         AlertUtils.errorDialog(getContext(), getString(R.string.error_initbuscador), new AlertUtils.OnErrorDialog() {
                             @Override
                             public void run() {
-                               //TODO finish();
+                            getActivity().finish();
                             }
                         });
                         break;
@@ -107,9 +107,9 @@ public class LoadingFragment extends BaseFragment {
                 AlertUtils.errorDialog(getContext(), getString(R.string.error_initbuscador), new AlertUtils.OnErrorDialog() {
                     @Override
                     public void run() {
-                        //TODO finish();
+                        getActivity().finish();
                     }
-                });
+                }).show();
             }
         });
     }
@@ -125,7 +125,7 @@ public class LoadingFragment extends BaseFragment {
 
         RestClient restClient = retrofit.create(RestClient.class);
 
-        Call<ArrayList<Bar>> call = restClient.getBares(mUUID, buscador.getLatitud(),buscador.getLongitud());
+        Call<ArrayList<Bar>> call = restClient.getBaresMasPopulares();
 
         call.enqueue(new Callback<ArrayList<Bar>>() {
             @Override
@@ -140,7 +140,7 @@ public class LoadingFragment extends BaseFragment {
                         AlertUtils.errorDialog(getContext(), getString(R.string.error_initbuscador), new AlertUtils.OnErrorDialog() {
                             @Override
                             public void run() {
-                                //TODO finish();
+                               getActivity().finish();
                             }
                         }).show();
                         break;
@@ -153,7 +153,7 @@ public class LoadingFragment extends BaseFragment {
                 AlertUtils.errorDialog(getContext(), getString(R.string.error_initbuscador), new AlertUtils.OnErrorDialog() {
                     @Override
                     public void run() {
-                        //TODO finish();
+                        getActivity().finish();
                     }
                 }).show();
             }

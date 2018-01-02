@@ -1,13 +1,21 @@
 package barinfo.navdev.barinfo;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.widget.Toast;
 
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.places.AutocompleteFilter;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -16,13 +24,15 @@ import java.util.ArrayList;
 import barinfo.navdev.barinfo.Clases.Bar;
 import barinfo.navdev.barinfo.Clases.Buscador;
 import barinfo.navdev.barinfo.Clases.Opinion;
+import barinfo.navdev.barinfo.Fragments.AddBarFragment;
 import barinfo.navdev.barinfo.Fragments.AddOpinionFragment;
 import barinfo.navdev.barinfo.Fragments.BarDetailsFragment;
-import barinfo.navdev.barinfo.Fragments.BarListFragment;
 import barinfo.navdev.barinfo.Fragments.FilterFragment;
 import barinfo.navdev.barinfo.Fragments.LoadingFragment;
 import barinfo.navdev.barinfo.Fragments.MainFragment;
 import barinfo.navdev.barinfo.Utils.AlertUtils;
+import barinfo.navdev.barinfo.Utils.Constants;
+import barinfo.navdev.barinfo.Utils.PreferencesManager;
 import barinfo.navdev.barinfo.Utils.RestClient;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -32,9 +42,10 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class InitActivity extends AppCompatActivity  implements LoadingFragment.OnLoadFinishListener,
         MainFragment.OnBarIsSelected, MainFragment.OnFilterButtonClick, BarDetailsFragment.OnAddOpinion,
-        AddOpinionFragment.OnSaveOpinion, FilterFragment.OnFilterButtonClick, FilterFragment.OnCancelButtonClick,
-        BarListFragment.OnListFragmentInteractionListener{
+        AddOpinionFragment.OnSaveOpinion, FilterFragment.OnListFragmentInteractionListener, FilterFragment.OnButtonAddBarListener,
+AddBarFragment.OnSaveBarListener{
 
+    private static final int REQUEST_CODE_AUTOCOMPLETE = 1;
     Buscador mBuscador;
     Bar mBarSelected;
     ArrayList<Bar> mBares;
@@ -159,6 +170,7 @@ public class InitActivity extends AppCompatActivity  implements LoadingFragment.
                 switch (response.code()) {
                     case 200:
                         mBarSelected = response.body();
+                        Toast.makeText(InitActivity.this,"Opinión guardada correctamente",Toast.LENGTH_LONG).show();
                         BarDetailsFragment barDetailsFragment = (BarDetailsFragment) getSupportFragmentManager().findFragmentByTag(BarDetailsFragment.TAG);
                         barDetailsFragment.setBar(mBarSelected);
                         getSupportFragmentManager().popBackStack();
@@ -189,24 +201,8 @@ public class InitActivity extends AppCompatActivity  implements LoadingFragment.
     }
 
     @Override
-    public void onClickFilterButton(Buscador buscador, ArrayList<Bar> bares) {
+    public void onFilterButtonClick(Buscador buscador) {
         mBuscador = buscador;
-        mBares = bares;
-
-        BarListFragment newFragment = BarListFragment.newInstance(mBares);
-
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.fragment_container, newFragment,BarListFragment.TAG);
-        transaction.commit();
-    }
-
-    @Override
-    public void onClickCancelButton() {
-
-    }
-
-    @Override
-    public void onFilterButtonClick() {
         FilterFragment newFragment = FilterFragment.newInstance(mBuscador);
 
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
@@ -219,6 +215,11 @@ public class InitActivity extends AppCompatActivity  implements LoadingFragment.
     public void onBackPressed() {
         super.onBackPressed();
         Fragment f = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        if (f.getTag().equalsIgnoreCase(FilterFragment.TAG)){
+            ((FilterFragment) f).filtrar();
+        }else if (f.getTag().equalsIgnoreCase(MainFragment.TAG)){
+            ((MainFragment) f).refreshBares();
+        }
     }
 
     @Override
@@ -247,7 +248,7 @@ public class InitActivity extends AppCompatActivity  implements LoadingFragment.
                         BarDetailsFragment newFragment = BarDetailsFragment.newInstance(mBarSelected);
                         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
                         transaction.replace(R.id.fragment_container, newFragment,BarDetailsFragment.TAG);
-                        transaction.addToBackStack(BarListFragment.TAG);
+                        transaction.addToBackStack(FilterFragment.TAG);
 
                         transaction.commit();
                         break;
@@ -274,5 +275,122 @@ public class InitActivity extends AppCompatActivity  implements LoadingFragment.
                 }).show();
             }
         });
+    }
+
+    @Override
+    public void onAddBar() {
+        /*AddBarFragment newFragment = AddBarFragment.newInstance(mBuscador);
+
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragment_container, newFragment,AddBarFragment.TAG);
+        transaction.addToBackStack(FilterFragment.TAG);
+        transaction.commit();*/
+
+        AutocompleteFilter typeFilter = new AutocompleteFilter.Builder()
+                .setTypeFilter(AutocompleteFilter.TYPE_FILTER_ESTABLISHMENT)
+                .build();
+
+        try {
+            Intent intent =
+                    new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_FULLSCREEN)
+                            .setFilter(typeFilter)
+                            .build(this);
+            startActivityForResult(intent, REQUEST_CODE_AUTOCOMPLETE);
+        } catch (GooglePlayServicesRepairableException e) {
+            e.printStackTrace();
+        } catch (GooglePlayServicesNotAvailableException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        // Check that the result was from the autocomplete widget.
+        if (requestCode == REQUEST_CODE_AUTOCOMPLETE) {
+            if (resultCode == RESULT_OK) {
+                // Get the user's selected place from the Intent.
+                Place place = PlaceAutocomplete.getPlace(this, data);
+                Bar nuevoBar = new Bar();
+                nuevoBar.setNombre(place.getName().toString());
+                nuevoBar.setDireccion(place.getAddress().toString());
+                nuevoBar.setLongitud(place.getLatLng().longitude);
+                nuevoBar.setLatitud(place.getLatLng().latitude);
+                nuevoBar.setDeviceid(PreferencesManager.getInstance().getValue(Constants.PREF_UUID)+"");
+
+                final ProgressDialog progressDialog = AlertUtils.progressDialog(this,"Guardando opinión");
+                progressDialog.show();
+                Gson gson = new GsonBuilder()
+                        .create();
+
+                Retrofit retrofit = new Retrofit.Builder()
+                        .baseUrl(RestClient.URL_BASE)
+                        .addConverterFactory(GsonConverterFactory.create(gson))
+                        .build();
+
+                RestClient restClient = retrofit.create(RestClient.class);
+
+                Call<Bar> call = restClient.addBar(nuevoBar);
+
+                call.enqueue(new Callback<Bar>() {
+                    @Override
+                    public void onResponse(Call<Bar> call, Response<Bar> response) {
+                        progressDialog.dismiss();
+                        switch (response.code()) {
+                            case 200:
+                                mBarSelected = response.body();
+                                BarDetailsFragment newFragment = BarDetailsFragment.newInstance(mBarSelected);
+                                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                                transaction.replace(R.id.fragment_container, newFragment,BarDetailsFragment.TAG);
+                                transaction.addToBackStack(MainFragment.TAG);
+
+                                transaction.commit();
+                                break;
+
+                            default:
+                                AlertUtils.errorDialog(InitActivity.this, getString(R.string.error_initbuscador), new AlertUtils.OnErrorDialog() {
+                                    @Override
+                                    public void run() {
+                                    }
+                                }).show();
+                                break;
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(@NonNull Call<Bar> call, Throwable t) {
+                        progressDialog.dismiss();
+                        Log.e("error", t.toString());
+                        AlertUtils.errorDialog(InitActivity.this, getString(R.string.error_initbuscador), new AlertUtils.OnErrorDialog() {
+                            @Override
+                            public void run() {
+                                //TODO finish();
+                            }
+                        }).show();
+                    }
+                });
+
+
+
+                Log.e("InitActivity", "Place: nombre = " + place.getName().toString());
+
+
+
+            } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
+                Status status = PlaceAutocomplete.getStatus(this, data);
+                Log.e("InitActivity", "Error: Status = " + status.toString());
+            } else if (resultCode == RESULT_CANCELED) {
+                // Indicates that the activity closed before a selection was made. For example if
+                // the user pressed the back button.
+            }
+        }
+    }
+
+
+
+    @Override
+    public void onSaveBar(Bar bar) {
+
     }
 }

@@ -16,6 +16,8 @@ public class Bar implements Serializable{
     String direccion;
     double latitud;
     double longitud;
+    int opiniones_count;
+    String deviceid;
 
     double distance;
 
@@ -83,5 +85,38 @@ public class Bar implements Serializable{
         }else{
             return (String.format("%.0f", getDistance())+" km");
         }
+    }
+
+    @Override
+    public String toString() {
+        return this.nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public void setNombreLocalidad(String nombreLocalidad) {
+        this.nombreLocalidad = nombreLocalidad;
+    }
+
+    public void setDireccion(String direccion) {
+        this.direccion = direccion;
+    }
+
+    public void setLatitud(double latitud) {
+        this.latitud = latitud;
+    }
+
+    public void setLongitud(double longitud) {
+        this.longitud = longitud;
+    }
+
+    public int getOpiniones_count() {
+        return opiniones_count;
+    }
+
+    public void setDeviceid(String deviceid) {
+        this.deviceid = deviceid;
     }
 }

@@ -18,10 +18,17 @@ import retrofit2.http.Path;
 
 public interface RestClient {
 
-    public static final String URL_BASE = "http://192.168.1.32:88/barinfo/public/api/";
+    public static final String URL_BASE = "http://barinfo.navarradeveloper.com/api/";
 
     @GET("buscador")
     Call<Buscador> getBuscador();
+
+
+    @GET("baresmaspopulares")
+    Call<ArrayList<Bar>> getBaresMasPopulares();
+
+    @GET("baresnombre")
+    Call<ArrayList<Bar>> getBaresNombre();
 
 
     @GET("barinfo/{id}")
@@ -29,6 +36,10 @@ public interface RestClient {
 
     @POST("addopinion")
     Call<Bar> addOpinion(@Body Opinion opinion);
+
+    @POST("addbar")
+    Call<Bar> addBar(@Body Bar bar);
+
 
     @POST("bares")
     @FormUrlEncoded
@@ -46,6 +57,7 @@ public interface RestClient {
                                   @Field("DescripZona") String DescripZona,
                                   @Field("Campo") JSONArray Campo,
                                   @Field("Latitud") double Latitud,
-                                  @Field("Longitud") double Longitud);
+                                  @Field("Longitud") double Longitud,
+                                  @Field("Distancia") float distancia);
 
 }

@@ -21,12 +21,11 @@
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
             app:expandedTitleTextAppearance="@style/AppTheme.Text.Transparent"
             app:toolbarId="@+id/toolbar">
-            <ImageView
+            <FrameLayout
+                android:id="@+id/streetviewpanorama_container"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/app_bar_height"
-                android:scaleType="centerCrop"
-                android:id="@+id/photo"
-                android:src="@drawable/defaultphoto"/>
+                android:layout_height="match_parent" />
+
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
@@ -47,6 +46,7 @@
         android:layout_margin="@dimen/fab_margin"
         app:layout_anchor="@id/toolbar"
         app:backgroundTint="@color/colorPrimaryLight"
+        android:visibility="gone"
         app:layout_anchorGravity="bottom|end"
         app:srcCompat="@drawable/ic_add_white_24dp" />
 
