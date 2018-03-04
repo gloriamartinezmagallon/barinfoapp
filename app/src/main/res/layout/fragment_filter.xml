@@ -72,6 +72,16 @@
                     android:text="Que esté a menos de..."
                     android:paddingBottom="@dimen/activity_vertical_margin_small"
                     android:textAppearance="@style/AppTheme.Text.Caption"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Para activar el filtro por distancia, pulse en este texto para habilitar el permiso de obtener tu ubicación actual."
+                    android:paddingBottom="@dimen/activity_vertical_margin_small"
+                    android:textColor="@android:color/holo_red_dark"
+                    android:clickable="true"
+                    android:id="@+id/textoaddpermiso"
+                    android:textAppearance="@style/AppTheme.Text.Caption"/>
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -97,16 +107,6 @@
                     android:minHeight="40dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Para activar el filtro por distancia, pulse en este texto para habilitar el permiso de obtener tu ubicación actual."
-                    android:paddingBottom="@dimen/activity_vertical_margin_small"
-                    android:textColor="@android:color/holo_red_dark"
-                    android:clickable="true"
-                    android:id="@+id/textoaddpermiso"
-                    android:textAppearance="@style/AppTheme.Text.Caption"/>
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

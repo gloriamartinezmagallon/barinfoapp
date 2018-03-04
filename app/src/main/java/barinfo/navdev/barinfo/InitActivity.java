@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import barinfo.navdev.barinfo.Clases.Bar;
 import barinfo.navdev.barinfo.Clases.Buscador;
 import barinfo.navdev.barinfo.Clases.Opinion;
-import barinfo.navdev.barinfo.Fragments.AddBarFragment;
 import barinfo.navdev.barinfo.Fragments.AddOpinionFragment;
 import barinfo.navdev.barinfo.Fragments.BarDetailsFragment;
 import barinfo.navdev.barinfo.Fragments.FilterFragment;
@@ -42,8 +41,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class InitActivity extends AppCompatActivity  implements LoadingFragment.OnLoadFinishListener,
         MainFragment.OnBarIsSelected, MainFragment.OnFilterButtonClick, BarDetailsFragment.OnAddOpinion,
-        AddOpinionFragment.OnSaveOpinion, FilterFragment.OnListFragmentInteractionListener, FilterFragment.OnButtonAddBarListener,
-AddBarFragment.OnSaveBarListener{
+        AddOpinionFragment.OnSaveOpinion, FilterFragment.OnListFragmentInteractionListener, FilterFragment.OnButtonAddBarListener{
 
     private static final int REQUEST_CODE_AUTOCOMPLETE = 1;
     Buscador mBuscador;
@@ -387,10 +385,11 @@ AddBarFragment.OnSaveBarListener{
         }
     }
 
-
-
-    @Override
-    public void onSaveBar(Bar bar) {
-
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        Fragment f = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        if (f.getTag().equalsIgnoreCase(FilterFragment.TAG)){
+            ((FilterFragment) f).comprobarPermisoUbicacion();
+        }
     }
 }

@@ -20,6 +20,8 @@ public class BarAdapter extends RecyclerView.Adapter<BarAdapter.ClienteViewHolde
 
     Activity mActivity;
 
+    boolean mIsMainFragment;
+
     //ImageLoader imageLoader;
 
     public interface OnItemClick{
@@ -30,9 +32,11 @@ public class BarAdapter extends RecyclerView.Adapter<BarAdapter.ClienteViewHolde
 
 
 
-    public BarAdapter(List<Bar> bares, Activity activity, OnItemClick onItemClick) {
+    public BarAdapter(List<Bar> bares, Activity activity, OnItemClick onItemClick, boolean isMainfragment) {
         this.mBares = bares;
         this.mActivity = activity;
+
+        this.mIsMainFragment = isMainfragment;
 
         this.monItemClick = onItemClick;
 
@@ -133,9 +137,13 @@ public class BarAdapter extends RecyclerView.Adapter<BarAdapter.ClienteViewHolde
             this.itemView = itemView;
 
             photo = (ImageView) itemView.findViewById(R.id.photo);
+            if (!mIsMainFragment)
+                photo.setVisibility(View.GONE);
             nombre = (TextView)itemView.findViewById(R.id.nombre);
             distancia = (TextView)itemView.findViewById(R.id.distancia);
             direccion = (TextView)itemView.findViewById(R.id.direccion);
+            if (!mIsMainFragment)
+                direccion.setVisibility(View.VISIBLE);
             numopiniones = (TextView)itemView.findViewById(R.id.numopiniones);
         }
     }

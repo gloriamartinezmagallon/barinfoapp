@@ -15,6 +15,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.weiwangcn.betterspinner.library.material.MaterialBetterSpinner;
 
@@ -223,6 +224,16 @@ public class AddOpinionFragment extends BaseFragment {
             camposLL.addView(child);
             camposViews.put(c.getId(),child);
         }
+
+        TextView txtAddnuevabebida = (TextView) v.findViewById(R.id.txtAddnuevabebida);
+        txtAddnuevabebida.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AddNuevoCampoDialog dialog = AddNuevoCampoDialog.newInstance(PreferencesManager.getInstance().getValue(Constants.PREF_UUID));
+                dialog.show(getFragmentManager(),"");
+
+            }
+        });
 
         Button button = (Button) v.findViewById(R.id.saveOpinion);
         button.setOnClickListener(new View.OnClickListener() {

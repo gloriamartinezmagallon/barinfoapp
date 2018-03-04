@@ -7,7 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -112,7 +112,7 @@ public class FilterFragment extends BaseFragment {
         mFormulario  = (ScrollView) v.findViewById(R.id.formulario);
         mResultados  = (LinearLayout) v.findViewById(R.id.resultados);
         mLista = (RecyclerView) v.findViewById(R.id.recyclerView);
-        mLista.setLayoutManager(new LinearLayoutManager(getContext()));
+        mLista.setLayoutManager(new GridLayoutManager(getContext(),1));
 
         mDistanciaSeekbar = (SeekBarWithHint) v.findViewById(R.id.distanciaSeekbar);
         mDistanciaSeekbar.setMax(20000);
@@ -452,7 +452,7 @@ public class FilterFragment extends BaseFragment {
             public void onClick(Bar bar) {
                 mListener.onListBarSelected(bar);
             }
-        }));
+        },false));
     }
 
     public interface OnListFragmentInteractionListener {
@@ -463,12 +463,12 @@ public class FilterFragment extends BaseFragment {
         void onAddBar();
     }
 
-    private void comprobarPermisoUbicacion() {
+    public void comprobarPermisoUbicacion() {
         if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             mTextoaddpermiso.setVisibility(View.VISIBLE);
             mDistanciaSeekbar.setEnabled(false);
-            mTextoaddpermiso.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
+            mTextoaddpermiso.setTextColor(getResources().getColor(R.color.colorAccent));
             mTextoaddpermiso.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -491,9 +491,5 @@ public class FilterFragment extends BaseFragment {
         }
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        comprobarPermisoUbicacion();
-    }
+
 }

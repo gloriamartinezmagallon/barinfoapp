@@ -7,24 +7,13 @@
     android:layout_margin="@dimen/activity_horizontal_margin"
     android:layout_marginBottom="0dp"
     app:cardElevation="0dp"
-    app:cardBackgroundColor="@color/bgPrimary"
+    app:cardBackgroundColor="@color/colorWhite"
     app:cardCornerRadius="0dp">
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="150dp"
+        android:layout_height="120dp"
         android:orientation="vertical">
-
-        <ImageView
-            android:id="@+id/photo"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:background="@drawable/defaultphoto"
-            android:scaleType="centerCrop"
-            android:src="@drawable/gradient_image"
-            android:visibility="gone" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -37,6 +26,17 @@
                 android:layout_height="match_parent"
                 android:orientation="horizontal">
 
+
+
+                <ImageView
+                    android:id="@+id/photo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="100dp"
+                    android:layout_gravity="center"
+                    android:paddingEnd="10dp"
+                    android:src="@mipmap/ic_launcher"
+                    android:scaleType="fitCenter"/>
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -45,8 +45,12 @@
 
                     <TextView
                         android:id="@+id/nombre"
+                        android:autoSizeTextType="uniform"
+                        android:maxLines="2"
+                        android:gravity="center_vertical"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
                         android:layout_gravity="top"
                         android:text="Nombre"
                         android:textAppearance="@style/AppTheme.Text.Heading" />
@@ -54,10 +58,10 @@
                     <TextView
                         android:id="@+id/direccion"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="wrap_content"
                         android:layout_gravity="top"
-                        android:layout_weight="2"
                         android:text="Dirección"
+                        android:visibility="gone"
                         android:textAppearance="@style/Base.TextAppearance.AppCompat.Small" />
 
                     <TextView
@@ -67,7 +71,7 @@
                         android:layout_gravity="bottom"
                         android:text="19 opiniones"
                         android:textAppearance="@style/Base.TextAppearance.AppCompat.Small"
-                        android:textColor="@color/colorPrimaryDark" />
+                        android:textColor="@color/colorAccent" />
                 </LinearLayout>
 
                 <TextView

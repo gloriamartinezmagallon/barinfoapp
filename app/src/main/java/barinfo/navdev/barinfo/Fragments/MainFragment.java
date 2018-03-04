@@ -76,7 +76,7 @@ public class MainFragment extends BaseFragment {
             public void onClick(Bar bar) {
                 onBarSelected(bar);
             }
-        });
+        },true);
         if (lista != null)
             lista.setAdapter(adapter);
     }
@@ -96,13 +96,11 @@ public class MainFragment extends BaseFragment {
                 mFilterButtonClick.onFilterButtonClick(mBuscador);
             }
         });
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(), 2);
-        tipos.setLayoutManager(gridLayoutManager);
+        tipos.setLayoutManager(new GridLayoutManager(getActivity(), 2));
         tipos.setAdapter(adapter);
 
 
-        LinearLayoutManager llm = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
-        lista.setLayoutManager(llm);
+        lista.setLayoutManager(new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL, false));
 
         Toolbar toolbar = (Toolbar) v.findViewById(R.id.toolbar);
 

@@ -60,12 +60,12 @@
                 android:rating="0"
                 android:stepSize="1"
                 app:colorFillOff="@android:color/transparent"
-                app:colorFillOn="@color/colorPrimary"
+                app:colorFillOn="@color/colorAccent"
                 app:colorFillPressedOff="@android:color/transparent"
-                app:colorFillPressedOn="@color/colorPrimaryLight"
-                app:colorOutlineOff="@color/colorPrimaryLight"
-                app:colorOutlineOn="@color/colorPrimaryDark"
-                app:colorOutlinePressed="@color/colorPrimaryLight"
+                app:colorFillPressedOn="@color/colorAccent"
+                app:colorOutlineOff="@color/colorAccent"
+                app:colorOutlineOn="@color/colorAccent"
+                app:colorOutlinePressed="@color/colorAccent"
                 app:polygonVertices="0"
                 app:polygonRotation="0"
                 app:strokeWidth="2dp"/>
@@ -82,6 +82,7 @@
             <com.weiwangcn.betterspinner.library.material.MaterialBetterSpinner
                 android:id="@+id/tipoACView"
                 android:layout_width="match_parent"
+                android:colorPrimary="@color/colorAccent"
                 android:layout_height="wrap_content"/>
 
             <LinearLayout style="@style/AppTheme.LinearLayoutSeparator.Horizontal"/>
@@ -97,6 +98,14 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:id="@+id/containerCampos"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/AppTheme.Text.Caption"
+                android:id="@+id/txtAddnuevabebida"
+                android:text="Añadir nueva bebida"
+                android:textColor="@color/colorAccent"/>
 
             <Button
                 android:layout_marginTop="@dimen/activity_vertical_margin"
