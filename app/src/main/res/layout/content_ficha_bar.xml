@@ -114,7 +114,7 @@
             <amagi82.flexibleratingbar.FlexibleRatingBar
                 android:id="@+id/flexibleRatingBar"
                 android:layout_width="match_parent"
-                android:layout_weight="4"
+                android:layout_weight="6"
                 android:layout_height="wrap_content"
                 android:numStars="5"
                 android:rating="0"
@@ -129,7 +129,7 @@
                 app:polygonVertices="0"
                 android:isIndicator="true"
                 app:polygonRotation="0"
-                app:strokeWidth="2dp"/>
+                app:strokeWidth="1dp"/>
 
             <LinearLayout
                 android:layout_width="match_parent"

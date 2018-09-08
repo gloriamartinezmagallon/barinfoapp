@@ -37,7 +37,8 @@ public class LoadingFragment extends BaseFragment {
 
     private OnLoadFinishListener mCallback;
     public interface OnLoadFinishListener {
-        public void onLoadFinish(Buscador buscador, ArrayList<Bar> bares);
+        void onLoadFinishBares(ArrayList<Bar> bares);
+        void onLoadFinishBuscador(Buscador buscador);
     }
 
     public LoadingFragment() { }
@@ -55,6 +56,7 @@ public class LoadingFragment extends BaseFragment {
             PreferencesManager.getInstance().setValue(Constants.PREF_UUID,mUUID);
         }
 
+        initBares();
         initBuscador();
     }
 
@@ -88,7 +90,7 @@ public class LoadingFragment extends BaseFragment {
                 switch (response.code()) {
                     case 200:
                         buscador = response.body();
-                        initBares();
+                        mCallback.onLoadFinishBuscador(buscador);
                         break;
                     default:
                         AlertUtils.errorDialog(getContext(), getString(R.string.error_initbuscador), new AlertUtils.OnErrorDialog() {
@@ -133,7 +135,7 @@ public class LoadingFragment extends BaseFragment {
                 switch (response.code()) {
                     case 200:
                         bares = response.body();
-                        mCallback.onLoadFinish(buscador,bares);
+                        mCallback.onLoadFinishBares(bares);
                         break;
 
                     default:

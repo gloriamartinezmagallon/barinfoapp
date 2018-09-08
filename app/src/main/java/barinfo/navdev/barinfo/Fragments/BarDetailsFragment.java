@@ -193,7 +193,7 @@ public class BarDetailsFragment extends BaseFragment {
         }
 
         //CARGAR OPINIONES
-        LinearLayout infoopiniones = (LinearLayout) mView.findViewById(R.id.infoopiniones);
+        LinearLayout infoopiniones = mView.findViewById(R.id.infoopiniones);
         if (mBar.getOpiniones().size() == 0) {
             infoopiniones.setVisibility(View.GONE);
             return;
@@ -218,15 +218,15 @@ public class BarDetailsFragment extends BaseFragment {
         }
         calidadmedia = calidadmedia/mBar.getOpiniones().size();
 
-        FlexibleRatingBar flexibleRatingBar = (FlexibleRatingBar) mView.findViewById(R.id.flexibleRatingBar);
+        FlexibleRatingBar flexibleRatingBar = mView.findViewById(R.id.flexibleRatingBar);
         flexibleRatingBar.setRating(calidadmedia);
-        TextView numopiniones = (TextView) mView.findViewById(R.id.numopiniones);
-        if (mBar.getOpiniones().size() > 1)
-            numopiniones.setText(mBar.getOpiniones().size()+" opiniones");
+        TextView numopiniones =  mView.findViewById(R.id.numopiniones);
+        if (mBar.getOpiniones().size() == 1)
+            numopiniones.setText(getString(R.string.bardetails_unaopinion));
         else
-            numopiniones.setText(mBar.getOpiniones().size()+" opinión");
+            numopiniones.setText(getString(R.string.bardetails_opiniones,mBar.getOpiniones().size()));
 
-        LinearLayout containerTipos = (LinearLayout) mView.findViewById(R.id.containerTipos);
+        LinearLayout containerTipos = mView.findViewById(R.id.containerTipos);
 
         Object[] a = tipos.entrySet().toArray();
         Arrays.sort(a, new Comparator() {

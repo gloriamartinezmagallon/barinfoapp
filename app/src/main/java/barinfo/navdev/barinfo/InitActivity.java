@@ -1,7 +1,9 @@
 package barinfo.navdev.barinfo;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -16,6 +18,8 @@ import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.AutocompleteFilter;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -38,6 +42,8 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class InitActivity extends AppCompatActivity  implements LoadingFragment.OnLoadFinishListener,
         MainFragment.OnBarIsSelected, MainFragment.OnFilterButtonClick, BarDetailsFragment.OnAddOpinion,
@@ -51,6 +57,8 @@ public class InitActivity extends AppCompatActivity  implements LoadingFragment.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
         setContentView(R.layout.activity_init);
 
 
@@ -71,11 +79,15 @@ public class InitActivity extends AppCompatActivity  implements LoadingFragment.
     }
 
     @Override
-    public void onLoadFinish(Buscador buscador, ArrayList<Bar> bares) {
+    public void onLoadFinishBuscador(Buscador buscador) {
         mBuscador = buscador;
+    }
+
+    @Override
+    public void onLoadFinishBares(ArrayList<Bar> bares) {
         mBares = bares;
 
-        MainFragment newFragment = MainFragment.newInstance(mBares,mBuscador);
+        MainFragment newFragment = MainFragment.newInstance(mBares);
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment_container, newFragment, MainFragment.TAG);
         transaction.commit();
@@ -199,14 +211,18 @@ public class InitActivity extends AppCompatActivity  implements LoadingFragment.
     }
 
     @Override
-    public void onFilterButtonClick(Buscador buscador) {
-        mBuscador = buscador;
-        FilterFragment newFragment = FilterFragment.newInstance(mBuscador);
+    public void onFilterButtonClick() {
+        if (mBuscador != null){
+            FilterFragment newFragment = FilterFragment.newInstance(mBuscador);
 
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.fragment_container, newFragment,FilterFragment.TAG);
-        transaction.addToBackStack(MainFragment.TAG);
-        transaction.commit();
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            transaction.replace(R.id.fragment_container, newFragment,FilterFragment.TAG);
+            transaction.addToBackStack(MainFragment.TAG);
+            transaction.commit();
+        }else{
+            Toast.makeText(this,R.string.pendiente_initbuscador,Toast.LENGTH_SHORT).show();
+        }
+
     }
 
     @Override
@@ -286,12 +302,15 @@ public class InitActivity extends AppCompatActivity  implements LoadingFragment.
 
         AutocompleteFilter typeFilter = new AutocompleteFilter.Builder()
                 .setTypeFilter(AutocompleteFilter.TYPE_FILTER_ESTABLISHMENT)
+                .setCountry("ES")
                 .build();
 
         try {
+            LatLngBounds latLngBounds = new LatLngBounds(new LatLng(41.9098937,-2.4999443),new LatLng(43.3149461,-0.7233368));
             Intent intent =
                     new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_FULLSCREEN)
                             .setFilter(typeFilter)
+                            .setBoundsBias(latLngBounds)
                             .build(this);
             startActivityForResult(intent, REQUEST_CODE_AUTOCOMPLETE);
         } catch (GooglePlayServicesRepairableException e) {
@@ -316,6 +335,11 @@ public class InitActivity extends AppCompatActivity  implements LoadingFragment.
                 nuevoBar.setLongitud(place.getLatLng().longitude);
                 nuevoBar.setLatitud(place.getLatLng().latitude);
                 nuevoBar.setDeviceid(PreferencesManager.getInstance().getValue(Constants.PREF_UUID)+"");
+                nuevoBar.setGoogle_phonenumber((String)place.getPhoneNumber());
+                nuevoBar.setGoogle_website(place.getWebsiteUri().toString());
+                nuevoBar.setGoogle_pricelevel(place.getPriceLevel());
+                nuevoBar.setGoogle_rating(place.getRating());
+
 
                 final ProgressDialog progressDialog = AlertUtils.progressDialog(this,"Guardando opinión");
                 progressDialog.show();
@@ -391,5 +415,10 @@ public class InitActivity extends AppCompatActivity  implements LoadingFragment.
         if (f.getTag().equalsIgnoreCase(FilterFragment.TAG)){
             ((FilterFragment) f).comprobarPermisoUbicacion();
         }
+    }
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
 }

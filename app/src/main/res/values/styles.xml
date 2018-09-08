@@ -1,10 +1,9 @@
-<resources xmlns:android="http://schemas.android.com/apk/res/android"
-
-    >
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
+
+    <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
@@ -19,10 +18,10 @@
 
     <style name="AppTheme.Text.Heading" parent="Base.TextAppearance.AppCompat.Headline">
         <item name="android:textColor">@color/colorPrimaryDark</item>
-        <item name="android:textSize">22sp</item>
     </style>
     <style name="AppTheme.Text.Subheading" parent="Base.TextAppearance.AppCompat.Subhead">
-
+        <item name="android:textColor">@color/colorPrimaryDark</item>
+        <item name="android:textSize">22sp</item>
     </style>
 
 
@@ -35,7 +34,8 @@
     </style>
 
     <style name="AppTheme.Text.Display1" parent="Base.TextAppearance.AppCompat.Display1">
-        <item name="android:textColor">#CC000000</item>
+        <item name="android:textColor">@color/colorSecundary</item>
+        <item name="fontPath">fonts/raleway_semibold.ttf</item>
     </style>
 
 
@@ -46,6 +46,7 @@
 
     <style name="AppTheme.Text.Headline" parent="Base.TextAppearance.AppCompat.Headline">
         <item name="android:paddingTop">8dp</item>
+        <item name="fontPath">fonts/raleway_regular.ttf</item>
     </style>
 
     <style name="AppTheme.Text.Caption" parent="TextAppearance.AppCompat.Caption">
@@ -62,7 +63,7 @@
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
     <style name="AppTheme.LinearLayoutSeparator" parent="Theme.AppCompat">
-        <item name="android:background">#33000000</item>
+        <item name="android:background">@color/colorSecundaryDark</item>
     </style>
 
     <style name="AppTheme.LinearLayoutSeparator.Horizontal">
@@ -70,5 +71,30 @@
         <item name="android:layout_height">1dp</item>
         <item name="android:layout_marginTop">@dimen/activity_vertical_margin_small</item>
         <item name="android:layout_marginBottom">@dimen/activity_vertical_margin_small</item>
+    </style>
+
+    <style name="AppTheme.BotonInicioBuscado" parent="Base.Widget.AppCompat.Button">
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:backgroundTint">#ffffff</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">@color/colorSecundary</item>
+        <item name="fontPath">fonts/raleway_semibold.ttf</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:padding">20dp</item>
+    </style>
+
+    <style name="AppTheme.BotonInicioFiltro" parent="Base.Widget.AppCompat.Button">
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_gravity">left|top</item>
+        <item name="android:backgroundTint">#ffffff</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textColor">@color/colorSecundary</item>
+        <item name="fontPath">fonts/raleway_semibold.ttf</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:padding">30dp</item>
     </style>
 </resources>

@@ -18,6 +18,10 @@ public class Bar implements Serializable{
     double longitud;
     int opiniones_count;
     String deviceid;
+    String google_phonenumber;
+    String google_website;
+    double google_rating;
+    int google_pricelevel;
 
     double distance;
 
@@ -118,5 +122,37 @@ public class Bar implements Serializable{
 
     public void setDeviceid(String deviceid) {
         this.deviceid = deviceid;
+    }
+
+    public String getGoogle_phonenumber() {
+        return google_phonenumber;
+    }
+
+    public void setGoogle_phonenumber(String google_phonenumber) {
+        this.google_phonenumber = google_phonenumber;
+    }
+
+    public String getGoogle_website() {
+        return google_website;
+    }
+
+    public void setGoogle_website(String google_website) {
+        this.google_website = google_website;
+    }
+
+    public double getGoogle_rating() {
+        return google_rating;
+    }
+
+    public void setGoogle_rating(double google_rating) {
+        this.google_rating = google_rating;
+    }
+
+    public int getGoogle_pricelevel() {
+        return google_pricelevel;
+    }
+
+    public void setGoogle_pricelevel(int google_pricelevel) {
+        this.google_pricelevel = google_pricelevel;
     }
 }

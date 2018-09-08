@@ -45,7 +45,6 @@
 
                     <TextView
                         android:id="@+id/nombre"
-                        android:autoSizeTextType="uniform"
                         android:maxLines="2"
                         android:gravity="center_vertical"
                         android:layout_width="match_parent"

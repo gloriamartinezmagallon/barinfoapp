@@ -12,6 +12,8 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -38,9 +40,8 @@ public class MainFragment extends BaseFragment {
     public static final String TAG = "MainFragment";
 
     private ArrayList<Bar> mBares;
-    private Buscador mBuscador;
 
-    private RecyclerView lista, tipos;
+    private RecyclerView lista;
 
     private OnBarIsSelected mBarSelectedListener;
     private OnFilterButtonClick mFilterButtonClick;
@@ -48,11 +49,10 @@ public class MainFragment extends BaseFragment {
     public MainFragment() { }
 
 
-    public static MainFragment newInstance(ArrayList<Bar> bares, Buscador buscador) {
+    public static MainFragment newInstance(ArrayList<Bar> bares) {
         MainFragment fragment = new MainFragment();
         Bundle args = new Bundle();
         args.putSerializable(Constants.EXTRA_BARES, bares);
-        args.putSerializable(Constants.EXTRA_BUSCADOR_INIT, buscador);
         fragment.setArguments(args);
         return fragment;
     }
@@ -62,48 +62,38 @@ public class MainFragment extends BaseFragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             mBares = (ArrayList<Bar>) getArguments().getSerializable(Constants.EXTRA_BARES);
-            mBuscador = (Buscador) getArguments().getSerializable(Constants.EXTRA_BUSCADOR_INIT);
         }else{
             throw new ClassCastException(getActivity().toString()
                     + " no envía bien los params");
         }
     }
 
-    private void cargarLista() {
-
-        BarAdapter adapter = new BarAdapter(mBares, getActivity(), new BarAdapter.OnItemClick() {
-            @Override
-            public void onClick(Bar bar) {
-                onBarSelected(bar);
-            }
-        },true);
-        if (lista != null)
-            lista.setAdapter(adapter);
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_main, container, false);
-        tipos = (RecyclerView) v.findViewById(R.id.tiposResturantes);
-        lista = (RecyclerView) v.findViewById(R.id.recyclerView);
 
-        TipoAdapter adapter = new TipoAdapter(mBuscador.getTipos(), getActivity(), new TipoAdapter.OnItemClick() {
+        final Button botonInicioBuscado = v.findViewById(R.id.botonInicioBuscado);
+        botonInicioBuscado.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(Tipo tipo) {
-                mBuscador.setTipoSeleccionado(tipo);
-                mFilterButtonClick.onFilterButtonClick(mBuscador);
+            public void onClick(View view) {
+                if (mFilterButtonClick != null){
+                    mFilterButtonClick.onFilterButtonClick();
+                }
             }
         });
-        tipos.setLayoutManager(new GridLayoutManager(getActivity(), 2));
-        tipos.setAdapter(adapter);
 
+        final Button botonBuscarBebida = v.findViewById(R.id.botonBuscarBebida);
+        botonBuscarBebida.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(getContext(),"holra",Toast.LENGTH_LONG).show();
+            }
+        });
 
-        lista.setLayoutManager(new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL, false));
-
-        Toolbar toolbar = (Toolbar) v.findViewById(R.id.toolbar);
-
+        Toolbar toolbar =  v.findViewById(R.id.toolbar);
         toolbar.setTitle(getResources().getString(R.string.app_name));
         toolbar.inflateMenu(R.menu.menu_main);
         toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
@@ -112,7 +102,7 @@ public class MainFragment extends BaseFragment {
                 switch (item.getItemId()) {
                     case R.id.action_filter:
                         if (mFilterButtonClick != null){
-                            mFilterButtonClick.onFilterButtonClick(mBuscador);
+                            mFilterButtonClick.onFilterButtonClick();
                         }
                         return true;
 
@@ -122,11 +112,25 @@ public class MainFragment extends BaseFragment {
             }
         });
 
+        //CARGAR LOS MAS POPULARES
+        lista = v.findViewById(R.id.recyclerView);
+        lista.setLayoutManager(new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL, false));
         cargarLista();
 
         return v;
+
     }
 
+    private void cargarLista() {
+        BarAdapter adapter = new BarAdapter(mBares, getActivity(), new BarAdapter.OnItemClick() {
+            @Override
+            public void onClick(Bar bar) {
+                onBarSelected(bar);
+            }
+        },true);
+        if (lista != null)
+            lista.setAdapter(adapter);
+    }
     public void onBarSelected(Bar bar) {
         if (mBarSelectedListener != null) {
             mBarSelectedListener.onBarIsSelected(bar);
@@ -163,7 +167,7 @@ public class MainFragment extends BaseFragment {
     }
 
     public interface OnFilterButtonClick {
-        void onFilterButtonClick(Buscador buscador);
+        void onFilterButtonClick();
     }
 
     public void refreshBares(){
@@ -211,4 +215,6 @@ public class MainFragment extends BaseFragment {
             }
         });
     }
+
+
 }
